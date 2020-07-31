@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { APP_SECRET, getUserId } = require('../utils');
- 
+
 //Mutation to validate, and add a user to the prisma database
 async function signup(parent, args, context, info) {
   // BASIC FIELD VALIDATION
@@ -12,6 +12,14 @@ async function signup(parent, args, context, info) {
 
   if (userExists) {
     throw new Error('This email is already connected to an account');
+  }
+
+  const userNameExists = await context.prisma.user.findOne({
+    where: { userName: args.userName },
+  });
+
+  if (userNameExists) {
+    throw new Error('User name already in use, please, try a different one');
   }
 
   //Basic Email validation
